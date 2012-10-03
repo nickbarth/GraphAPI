@@ -1,38 +1,44 @@
-# RakeAR
-RakeAR is a Ruby Gem containing some common Rake tasks to help manage your ActiveRecord database independant of Rails.
+# GraphAPI
+GraphAPI is a Ruby Gem containing some common tasks to help manage Facebook users using the Facebook Graph API.
 
-# How To Use
+## Usage
 
-Install the gem 
+Here is how to use it.
 
-    gem install rake-ar
+### Add it to your Gemfile
 
-Add a require to your `Rakefile`
+    gem 'sprock-assets', require 'sprock_assets'
 
-    require 'rake_ar/rake'
+### Set up your Facebook Appications constants
 
-You will now have some rake tasks to manage your ActiveRecord database.
+You will have to configure the module before using it. Here is an example setup.
 
-    rake -T
+    module GraphAPI
+      # Public: Required constant used for Facebook private application secret.
+      APP_SECRET = '124ca2a483f12723cafa7a5da33a3492'
+      # Public: Required constant used for Facebook private application client ID.
+      CLIENT_ID  = '234513432316919'
+      # Public: Reqired constant used for Facebook call back URL when receiving the Facebook connect code param.
+      CALLBACK_URL = nil
+      # Public: Required constant used for setting Facebook application requirements.
+      ACCESS_SCOPE = [:offline_access, :email, :user_photos, :user_location, :user_about_me]
+      # Public: Required constant used for setting the fields pulled for.
+      USER_FIELDS = [:id, :picture, :name, :gender, :link, :email, :verified, :bio]
+    end
 
-    rake db:clear             # Clear all database records
-    rake db:console           # Loads IRB with your ActiveRecord models and a database connection
-    rake db:create_migration  # Creates a new ActiveRecord migration
-    rake db:drop              # Drops all database tables
-    rake db:load              # Loads your schema file into the database
-    rake db:migrate           # Migrates your database
-    rake db:regen             # Regenerates the database from migrations
-    rake db:reseed            # Reloads the database from your schema file and reseeds it
-    rake db:schema            # Dumps a new schema file
-    rake db:seed              # Loads your seed data file
+### Add it to your Application
 
-To configure them just initialize a new instance of RakeAR in your `Rakefile` to override the defaults.
+Once configured you will be able to use any of its functions in your application. Here is basic example using Sinatra.
 
-    @rake_ar = RakeAR.new connect_file:   "#{Dir.pwd}/db/connect.rb", # File containing a valid ActiveRecord connection
-                          migration_path: "#{Dir.pwd}/db/migrate/",   # Path to migrations folder
-                          seed_file:      "#{Dir.pwd}/db/seeds.rb",   # Ruby database seed script
-                          schema_file:    "#{Dir.pwd}/db/schema.rb",  # Schema file the database is written too and loaded from
-                          models_path:    "#{Dir.pwd}/app/models"     # Path to the applications ActiveRecord models
+    get '/facebook_login' do
+      redirect FaceGraph::auth_url
+    end
+
+    get '/facebook_auth' do
+      @facebook_user = GraphAPI::fetch_user(params[:code])
+      @photo = GraphAPI::fetch_photo(@facebook_user['access_token'])
+      render :signed_in
+    end
 
 ### License
 WTFPL &copy; 2012 Nick Barth
