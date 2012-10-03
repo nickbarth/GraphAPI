@@ -1,3 +1,3 @@
 module GraphAPI
-  VERSION = '0.5.1'
+  VERSION = '0.9.1'
 end
