@@ -15,24 +15,41 @@ require 'json'
 #
 module GraphAPI
   # Public: Required constant used for Facebook private application secret.
-  APP_SECRET = ''
+  #
+  # Example:
+  #
+  # APP_SECRET = '124ca2a483f12723cafa7a5da33a3492'
+
   # Public: Required constant used for Facebook private application client ID.
-  CLIENT_ID  = ''
+  #
+  # Example
+  #
+  # CLIENT_ID  = '234513432316919'
+
   # Public: Reqired constant used for Facebook call back URL when receiving the Facebook connect code param.
-  CALLBACK_URL = nil
+  #
+  # Example
+  #
+  # CALLBACK_URL = nil
+
   # Public: Required constant used for setting Facebook application requirements.
-  ACCESS_SCOPE = []
+  #
+  # Example
+  #
+  # ACCESS_SCOPE = [:offline_access, :email, :user_photos, :user_location, :user_about_me]
+
   # Public: Required constant used for setting the fields pulled for.
-  USER_FIELDS = []
+  #
+  # Example
+  #
+  # USER_FIELDS = [:id, :picture, :name, :gender, :link, :email, :verified, :bio]
 
   # Public: Method for configuring the setting constants for a nicer syntax.
   #
   # Example:
   #
-  # GraphAPI.config do
-  #  APP_SECRET: '654321'
-  #  CLIENT_ID:  '123456'
-  # end
+  # GraphAPI.config APP_SECRET: '124ca2a483f12723cafa7a5da33a3492',
+  #                 CLIENT_ID:  '234513432316919'
   #
   def self.config(consts)
     consts.each do |const, value|
