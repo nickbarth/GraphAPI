@@ -7,6 +7,22 @@ describe GraphAPI do
     stub_const('GraphAPI::APP_SECRET', 'APP_SECRET')
   end
 
+  describe '#config' do
+    it 'should configuration constants to be set' do
+      GraphAPI.config
+        APP_SECRET:   'APP_SECRET'
+        CLIENT_ID:    'CLIENT_ID'
+        CALLBACK_URL: 'CALLBACK_URL'
+        ACCESS_SCOPE: 'ACCESS_SCOPE'
+        USER_FIELDS:  'USER_FIELDS'
+      GraphAPI.APP_SECRET.should == 'APP_SECRET'
+      GraphAPI.CLIENT_ID.should == 'CLIENT_ID'
+      GraphAPI.CALLBACK_URL.should == 'CALLBACK_URL'
+      GraphAPI.ACCESS_SCOPE.should == 'ACCESS_SCOPE'
+      GraphAPI.USER_FIELDS.should == 'USER_FIELDS'
+    end
+  end
+
   describe '#auth_url' do
     before(:each) do
       stub_const('GraphAPI::ACCESS_SCOPE', [:SCOPE1, :SCOPE2])
