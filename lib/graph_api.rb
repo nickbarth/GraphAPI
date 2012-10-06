@@ -1,4 +1,6 @@
 require 'json'
+require 'rest_client'
+
 # Public: Various methods useful for interfacing with Facebook Graph protocol.
 #
 # Example:
@@ -51,9 +53,9 @@ module GraphAPI
   # GraphAPI.config APP_SECRET: '124ca2a483f12723cafa7a5da33a3492',
   #                 CLIENT_ID:  '234513432316919'
   #
-  def self.config(consts)
+  def config(consts)
     consts.each do |const, value|
-      self.const_set(const.to_s, value)
+      const_set(const.to_s, value)
     end
   end
 
@@ -62,7 +64,7 @@ module GraphAPI
   # callback_url - With CALLBACK_URL set to nil setting this parameter will use
   #                the sent callback. This is useful when you're using dynamic
   #                URIs with subdomains.
-  def self.auth_url(callback_url=nil)
+  def auth_url(callback_url=nil)
     "https://graph.facebook.com/oauth/authorize?client_id=#{CLIENT_ID}" +
     "&redirect_uri=#{CALLBACK_URL or callback_url}" +
     "&scope=#{ACCESS_SCOPE.join(',')}"
@@ -76,7 +78,7 @@ module GraphAPI
   # callback_url - With CALLBACK_URL set to nil setting this parameter will use
   #                the sent callback. This is useful when you're using dynamic
   #                URIs with subdomains.
-  def self.fetch_token(code, callback_url=nil)
+  def fetch_token(code, callback_url=nil)
     RestClient.get('https://graph.facebook.com/oauth/access_token', { client_id:     CLIENT_ID,
                                                                       redirect_uri:  (CALLBACK_URL or callback_url),
                                                                       client_secret: APP_SECRET,
@@ -90,13 +92,13 @@ module GraphAPI
   # access_token - The access token required for making the request on the Facebook users behalf.
   #
   # Returns a parsed JSON array returned from the Facebook service with a format like ['example' => 'some_data'].
-  def self.request(url, access_token)
+  def request(url, access_token)
     JSON.parse(RestClient.get "https://graph.facebook.com#{url}&access_token=#{access_token}")
   end
 
   # Public: Returns a Facebook user array containing the fields set by the
   #         USER_FIELDS constant and the access token for convenience.
-  def self.request_user(access_token)
+  def request_user(access_token)
     request("/me?&fields=#{USER_FIELDS.join(',')}", access_token).
       merge('access_token' => access_token)
   end
@@ -107,7 +109,7 @@ module GraphAPI
   # callback_url - With CALLBACK_URL set to nil setting this parameter will use
   #                the sent callback. This is useful when you're using dynamic
   #                URIs with subdomains.
-  def self.fetch_user(code, callback_url=nil)
+  def fetch_user(code, callback_url=nil)
     access_token = fetch_token(code, callback_url)
     request_user(access_token)
   end
@@ -115,7 +117,7 @@ module GraphAPI
   # Public: Fetches and returns the cover photo src for a Facebook user.
   #
   # access_token - This method requires an Facebook Authentication token.
-  def self.fetch_photo(access_token)
+  def fetch_photo(access_token)
     albums = request('/me/albums?fields=id,cover_photo,type', access_token)['data']
     photo_id = albums.find{|x| x['type'] == 'profile'}['cover_photo']
     request("/#{photo_id}/?fields=source", access_token)['source']
@@ -124,7 +126,9 @@ module GraphAPI
   # Public: Fetches and returns the current thumbnail src for a Facebook user.
   #
   # access_token - This method requires an Facebook Authentication token.
-  def self.fetch_thumbnail(access_token)
+  def fetch_thumbnail(access_token)
     request('/me?fields=picture', access_token)['picture']
   end
+
+  extend self
 end

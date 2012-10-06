@@ -14,6 +14,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency('rake')
   gem.add_dependency('json')
+  gem.add_dependency('rest-client')
   gem.add_development_dependency('rspec')
 
   gem.files         = `git ls-files`.split($/)
