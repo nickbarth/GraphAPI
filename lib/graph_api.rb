@@ -6,68 +6,75 @@ require 'rest_client'
 # Example:
 #
 #   get '/facebook_login' do
-#     redirect FaceGraph::auth_url
+#     redirect FaceGraph.auth_url
 #   end
 #
 #   get '/facebook_auth' do
-#     @facebook_user = GraphAPI::fetch_user(params[:code])
-#     @photo = GraphAPI::fetch_photo(@facebook_user['access_token'])
+#     @facebook_user = GraphAPI.fetch_user(params[:code])
+#     @photo = GraphAPI.fetch_photo(@facebook_user['access_token'])
 #     render :signed_in
 #   end
 #
 module GraphAPI
-  # Public: Required constant used for Facebook private application secret.
+  VERSION = '0.9.5'
+
+  # Public: Required setting used for Facebook private application secret.
   #
   # Example:
   #
-  # APP_SECRET = '124ca2a483f12723cafa7a5da33a3492'
+  # @app_secret = '124ca2a483f12723cafa7a5da33a3492'
+  attr_accessor :app_secret
 
-  # Public: Required constant used for Facebook private application client ID.
+  # Public: Required setting used for Facebook private application client ID.
   #
   # Example
   #
-  # CLIENT_ID  = '234513432316919'
+  # @client_id  = '234513432316919'
+  attr_accessor :client_id
 
-  # Public: Reqired constant used for Facebook call back URL when receiving the Facebook connect code param.
+  # Public: Reqired setting used for Facebook call back URL when receiving the Facebook connect code param.
   #
   # Example
   #
-  # CALLBACK_URL = nil
+  # @callback_url = nil
+  attr_accessor :callback_url
 
-  # Public: Required constant used for setting Facebook application requirements.
+  # Public: Required setting used for setting Facebook application requirements.
   #
   # Example
   #
-  # ACCESS_SCOPE = [:offline_access, :email, :user_photos, :user_location, :user_about_me]
+  # @access_scope = [:offline_access, :email, :user_photos, :user_location, :user_about_me]
+  attr_accessor :access_scope
 
-  # Public: Required constant used for setting the fields pulled for.
+  # Public: Required setting used for setting the fields pulled for.
   #
   # Example
   #
-  # USER_FIELDS = [:id, :picture, :name, :gender, :link, :email, :verified, :bio]
+  # @user_fields = [:id, :picture, :name, :gender, :link, :email, :verified, :bio]
+  attr_accessor :user_fields
 
-  # Public: Method for configuring the setting constants for a nicer syntax.
+  # Public: Method for configuring the setting settings for a nicer syntax.
   #
   # Example:
   #
-  # GraphAPI.config APP_SECRET: '124ca2a483f12723cafa7a5da33a3492',
-  #                 CLIENT_ID:  '234513432316919'
+  # GraphAPI.config app_secret: '124ca2a483f12723cafa7a5da33a3492',
+  #                 client_id:  '234513432316919'
   #
-  def config(consts)
-    consts.each do |const, value|
-      const_set(const.to_s, value)
+  def config(settings)
+    settings.each do |setting, value|
+      self.send("#{setting}=", value)
     end
   end
 
-  # Public: Creates and returns a Facebook Authentication URL based on the supplied constants.
+  # Public: Creates and returns a Facebook Authentication URL based on the supplied settings.
   #
-  # callback_url - With CALLBACK_URL set to nil setting this parameter will use
+  # callback_url - With @callback_url set to nil setting this parameter will use
   #                the sent callback. This is useful when you're using dynamic
   #                URIs with subdomains.
   def auth_url(callback_url=nil)
-    "https://graph.facebook.com/oauth/authorize?client_id=#{CLIENT_ID}" +
-    "&redirect_uri=#{CALLBACK_URL or callback_url}" +
-    "&scope=#{ACCESS_SCOPE.join(',')}"
+    "https://graph.facebook.com/oauth/authorize?client_id=#{@client_id}" +
+    "&redirect_uri=#{@callback_url or callback_url}" +
+    "&scope=#{@access_scope.join(',')}"
   end
 
   # Public: Requests the Access Token from the Facebook Graph API and returns it as a string.
@@ -75,13 +82,13 @@ module GraphAPI
   # code - The code parameter is the param you receive when the Facebook Graph
   #        API hits your call back URI.
   #
-  # callback_url - With CALLBACK_URL set to nil setting this parameter will use
+  # callback_url - With @callback_url set to nil setting this parameter will use
   #                the sent callback. This is useful when you're using dynamic
   #                URIs with subdomains.
   def fetch_token(code, callback_url=nil)
-    RestClient.get('https://graph.facebook.com/oauth/access_token', { client_id:     CLIENT_ID,
-                                                                      redirect_uri:  (CALLBACK_URL or callback_url),
-                                                                      client_secret: APP_SECRET,
+    RestClient.get('https://graph.facebook.com/oauth/access_token', { client_id:     @client_id,
+                                                                      redirect_uri:  (@callback_url or callback_url),
+                                                                      client_secret: @app_secret,
                                                                       code:          code
     })[/access_token=(.+?)&/, 1]
   end
@@ -97,16 +104,16 @@ module GraphAPI
   end
 
   # Public: Returns a Facebook user array containing the fields set by the
-  #         USER_FIELDS constant and the access token for convenience.
+  #         @user_fields setting and the access token for convenience.
   def request_user(access_token)
-    request("/me?&fields=#{USER_FIELDS.join(',')}", access_token).
+    request("/me?&fields=#{@user_fields.join(',')}", access_token).
       merge('access_token' => access_token)
   end
 
   # Public: Convenience method for fetching a Facebook user array from the
   #         Facebook token code.
   #
-  # callback_url - With CALLBACK_URL set to nil setting this parameter will use
+  # callback_url - With @callback_url set to nil setting this parameter will use
   #                the sent callback. This is useful when you're using dynamic
   #                URIs with subdomains.
   def fetch_user(code, callback_url=nil)

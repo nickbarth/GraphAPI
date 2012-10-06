@@ -7,38 +7,39 @@ describe GraphAPI do
 
   describe '#config' do
     it 'should configuration constants to be set' do
-      GraphAPI.config APP_SECRET:   'APP_SECRET',
-                      CLIENT_ID:    'CLIENT_ID',
-                      CALLBACK_URL: 'CALLBACK_URL',
-                      ACCESS_SCOPE: 'ACCESS_SCOPE',
-                      USER_FIELDS:  'USER_FIELDS'
-      GraphAPI::APP_SECRET.should   == 'APP_SECRET'
-      GraphAPI::CLIENT_ID.should    == 'CLIENT_ID'
-      GraphAPI::CALLBACK_URL.should == 'CALLBACK_URL'
-      GraphAPI::ACCESS_SCOPE.should == 'ACCESS_SCOPE'
-      GraphAPI::USER_FIELDS.should  == 'USER_FIELDS'
+      GraphAPI.config app_secret:   'APP_SECRET',
+                      client_id:    'CLIENT_ID',
+                      callback_url: 'CALLBACK_URL',
+                      access_scope: 'ACCESS_SCOPE',
+                      user_fields:  'USER_FIELDS'
+
+      GraphAPI.app_secret.should   == 'APP_SECRET'
+      GraphAPI.client_id.should    == 'CLIENT_ID'
+      GraphAPI.callback_url.should == 'CALLBACK_URL'
+      GraphAPI.access_scope.should == 'ACCESS_SCOPE'
+      GraphAPI.user_fields.should  == 'USER_FIELDS'
     end
   end
 
   describe '#auth_url' do
     before(:each) do
-      stub_const('GraphAPI::ACCESS_SCOPE', [:SCOPE1, :SCOPE2])
+      GraphAPI.access_scope = [:SCOPE1, :SCOPE2]
     end
 
     it 'should use generate a URI' do
-      stub_const('GraphAPI::CALLBACK_URL', nil)
+      GraphAPI.callback_url = nil
       GraphAPI.auth_url('CALLBACK').should == 'https://graph.facebook.com/oauth/authorize?client_id=CLIENT_ID&redirect_uri=CALLBACK&scope=SCOPE1,SCOPE2'
     end
 
     it 'should use CLIENT_ID const if avaliable' do
-      stub_const('GraphAPI::CALLBACK_URL', 'CALLBACK_URL')
+      GraphAPI.callback_url = 'CALLBACK_URL'
       GraphAPI.auth_url.should == 'https://graph.facebook.com/oauth/authorize?client_id=CLIENT_ID&redirect_uri=CALLBACK_URL&scope=SCOPE1,SCOPE2'
     end
   end
 
   describe '#fetch_token' do
     it 'should return the access token' do
-      stub_const('GraphAPI::CALLBACK_URL', 'CALLBACK_URL')
+      GraphAPI.callback_url = 'CALLBACK_URL'
       RestClient.should_receive(:get).with('https://graph.facebook.com/oauth/access_token', { client_id:     'CLIENT_ID',
                                                                                               redirect_uri:  'CALLBACK_URL',
                                                                                               client_secret: 'APP_SECRET',
@@ -57,7 +58,7 @@ describe GraphAPI do
 
   describe '#request_user' do
     it 'should return a user' do
-      stub_const('GraphAPI::USER_FIELDS', [:FIELD1, :FIELD2])
+      GraphAPI.user_fields = [:FIELD1, :FIELD2]
       GraphAPI.should_receive(:request).with('/me?&fields=FIELD1,FIELD2', 'ACCESS_TOKEN').and_return({})
       GraphAPI.request_user('ACCESS_TOKEN').should == {'access_token' => 'ACCESS_TOKEN'}
     end
@@ -65,8 +66,8 @@ describe GraphAPI do
 
   describe '#fetch_user' do
     it 'should return a user' do
-      stub_const('GraphAPI::USER_FIELDS', [:FIELD1, :FIELD2])
-      stub_const('GraphAPI::CALLBACK_URL', 'CALLBACK_URL')
+      GraphAPI.user_fields = [:FIELD1, :FIELD2]
+      GraphAPI.callback_url = 'CALLBACK_URL'
       GraphAPI.stub(:fetch_token).and_return('ACCESS_TOKEN')
       GraphAPI.should_receive(:request).with('/me?&fields=FIELD1,FIELD2', 'ACCESS_TOKEN').and_return({})
       GraphAPI.fetch_user('CODE').should == {'access_token' => 'ACCESS_TOKEN'}
