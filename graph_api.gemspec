@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ['nick@nickbarth.ca']
   gem.summary       = 'A Ruby Gem for common Facebook Graph API tasks.'
   gem.description   = 'GraphAPI is a Ruby Gem containing some common tasks to help manage Facebook users using the Facebook Graph API.'
-  gem.homepage      = 'https://github.com/nickbarth/RakeAR'
+  gem.homepage      = 'https://github.com/nickbarth/GraphAPI'
 
   gem.add_dependency('rake')
   gem.add_dependency('json')

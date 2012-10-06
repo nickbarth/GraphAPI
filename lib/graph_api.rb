@@ -1,5 +1,6 @@
 require 'json'
 require 'rest_client'
+require 'graph_api/version'
 
 # Public: Various methods useful for interfacing with Facebook Graph protocol.
 #
@@ -16,8 +17,6 @@ require 'rest_client'
 #   end
 #
 module GraphAPI
-  VERSION = '0.9.6'
-
   # Public: Required setting used for Facebook private application secret.
   #
   # Example:
