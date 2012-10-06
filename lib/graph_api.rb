@@ -16,7 +16,7 @@ require 'rest_client'
 #   end
 #
 module GraphAPI
-  VERSION = '0.9.5'
+  VERSION = '0.9.6'
 
   # Public: Required setting used for Facebook private application secret.
   #
