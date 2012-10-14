@@ -24,10 +24,10 @@ You will have to configure the module before using it. Here is an example setup.
 Once configured you will be able to use any of its functions in your application. Here is basic example using Sinatra.
 
     get '/facebook_login' do
-      redirect FaceGraph.auth_url
+      redirect GraphAPI.auth_url
     end
 
-    get '/facebook_auth' do
+    get '/facebook_callback' do
       @facebook_user = GraphAPI.fetch_user(params[:code])
       @photo = GraphAPI.fetch_photo(@facebook_user['access_token'])
       render :signed_in
