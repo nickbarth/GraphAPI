@@ -85,10 +85,10 @@ module GraphAPI
   #                the sent callback. This is useful when you're using dynamic
   #                URIs with subdomains.
   def fetch_token(code, callback_url=nil)
-    RestClient.get('https://graph.facebook.com/oauth/access_token', { client_id:     @client_id,
-                                                                      redirect_uri:  (@callback_url or callback_url),
-                                                                      client_secret: @app_secret,
-                                                                      code:          code
+    RestClient.post('https://graph.facebook.com/oauth/access_token', { client_id:     @client_id,
+                                                                       redirect_uri:  (@callback_url or callback_url),
+                                                                       client_secret: @app_secret,
+                                                                       code:          code
     })[/access_token=(.+?)&/, 1]
   end
 
