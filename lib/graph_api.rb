@@ -133,7 +133,7 @@ module GraphAPI
   #
   # access_token - This method requires an Facebook Authentication token.
   def fetch_thumbnail(access_token)
-    request('/me?fields=picture', access_token)['picture']
+    request('/me?fields=picture', access_token)['picture']['data']['url']
   end
 
   extend self
