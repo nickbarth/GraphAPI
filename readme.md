@@ -7,7 +7,7 @@ Here is how to use it.
 
 ### Add it to your Gemfile
 
-    gem 'graph-api', require 'graph_api'
+    gem 'graph-api', require: 'graph_api'
 
 ### Set up your Facebook Appications constants
 
