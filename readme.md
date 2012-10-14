@@ -19,6 +19,8 @@ You will have to configure the module before using it. Here is an example setup.
                     access_scope: [:offline_access, :email, :user_photos] # The Facebook application requirements
                     user_fields:  [:id, :picture, :name, :gender, :email] # The user fields pulled for
 
+Visit https://developers.facebook.com/apps to register your Facebook application.
+
 ### Add it to your Application
 
 Once configured you will be able to use any of its functions in your application. Here is basic example using Sinatra.
