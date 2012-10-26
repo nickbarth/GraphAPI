@@ -30,9 +30,15 @@ Once configured you will be able to use any of its functions in your application
     end
 
     get '/facebook_callback' do
-      @facebook_user = GraphAPI.fetch_user(params[:code])
-      @photo = GraphAPI.fetch_photo(@facebook_user['access_token'])
+      @facebook_user = GraphAPI.new(params[:code])
+      session[:auth_token] = @facebook_user.auth_token
       render :signed_in
+    end
+
+    get '/profile'
+      @facebook_user = GraphAPI.new(session[:auth_token])
+      logger.info "User #{@facebook_user.first_name} viewed their profile."
+      render :profile
     end
 
 ### License
