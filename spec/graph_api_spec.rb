@@ -40,10 +40,10 @@ describe GraphAPI do
   describe '#fetch_token' do
     it 'should return the access token' do
       GraphAPI.callback_url = 'CALLBACK_URL'
-      RestClient.should_receive(:get).with('https://graph.facebook.com/oauth/access_token', { client_id:     'CLIENT_ID',
-                                                                                              redirect_uri:  'CALLBACK_URL',
-                                                                                              client_secret: 'APP_SECRET',
-                                                                                              code:          'CODE'
+      RestClient.should_receive(:post).with('https://graph.facebook.com/oauth/access_token', { client_id:     'CLIENT_ID',
+                                                                                               redirect_uri:  'CALLBACK_URL',
+                                                                                               client_secret: 'APP_SECRET',
+                                                                                               code:          'CODE'
       }).and_return('access_token=ACCESS_TOKEN&')
       GraphAPI.fetch_token('CODE').should == 'ACCESS_TOKEN'
     end
@@ -56,37 +56,39 @@ describe GraphAPI do
     end
   end
 
-  describe '#request_user' do
-    it 'should return a user' do
-      GraphAPI.user_fields = [:FIELD1, :FIELD2]
-      GraphAPI.should_receive(:request).with('/me?&fields=FIELD1,FIELD2', 'ACCESS_TOKEN').and_return({})
-      GraphAPI.request_user('ACCESS_TOKEN').should == {'access_token' => 'ACCESS_TOKEN'}
+  describe '#new' do
+    context 'with an access_token param' do
+      it 'should set the auth_token' do
+        GraphAPI.new('ACCESS_TOKEN').access_token.should ==  'ACCESS_TOKEN'
+      end
+    end
+
+    context 'with a code param' do
+      it 'should set the auth_token' do
+        GraphAPI.stub(:fetch_token).and_return('ACCESS_TOKEN')
+        GraphAPI.new(nil, 'CODE').access_token.should == 'ACCESS_TOKEN'
+      end
     end
   end
 
-  describe '#fetch_user' do
-    it 'should return a user' do
-      GraphAPI.user_fields = [:FIELD1, :FIELD2]
-      GraphAPI.callback_url = 'CALLBACK_URL'
-      GraphAPI.stub(:fetch_token).and_return('ACCESS_TOKEN')
-      GraphAPI.should_receive(:request).with('/me?&fields=FIELD1,FIELD2', 'ACCESS_TOKEN').and_return({})
-      GraphAPI.fetch_user('CODE').should == {'access_token' => 'ACCESS_TOKEN'}
+  context 'Instance' do
+    describe '#photo' do
+      it 'should return a photo URI' do
+        albums_data = {'data' => [{'type' => 'profile', 'cover_photo' => 'PHOTO_ID'}]}
+        GraphAPI.should_receive(:request).with('/me/albums?fields=id,cover_photo,type', 'ACCESS_TOKEN').and_return(albums_data)
+        GraphAPI.should_receive(:request).with('/PHOTO_ID/?fields=source', 'ACCESS_TOKEN').and_return({'source' => 'PHOTO_URI'})
+        fg_user = GraphAPI.new('ACCESS_TOKEN')
+        fg_user.photo.should == 'PHOTO_URI'
+      end
     end
-  end
 
-  describe '#fetch_photo' do
-    it 'should return a photo URI' do
-      albums_data = {'data' => [{'type' => 'profile', 'cover_photo' => 'PHOTO_ID'}]}
-      GraphAPI.should_receive(:request).with('/me/albums?fields=id,cover_photo,type', 'ACCESS_TOKEN').and_return(albums_data)
-      GraphAPI.should_receive(:request).with('/PHOTO_ID/?fields=source', 'ACCESS_TOKEN').and_return({'source' => 'PHOTO_URI'})
-      GraphAPI.fetch_photo('ACCESS_TOKEN').should == 'PHOTO_URI'
-    end
-  end
-
-  describe '#fetch_thumbnail' do
-    it 'should return a photo URI' do
-      GraphAPI.should_receive(:request).with('/me?fields=picture', 'ACCESS_TOKEN').and_return({'picture' => 'PHOTO_URI'})
-      GraphAPI.fetch_thumbnail('ACCESS_TOKEN').should == 'PHOTO_URI'
+    describe '#thumbnail' do
+      it 'should return a photo URI' do
+        GraphAPI.user_fields = []
+        GraphAPI.should_receive(:request).with('/me?fields=picture', 'ACCESS_TOKEN').and_return({'picture' => {'data' => {'url' => 'PHOTO_URI'}}})
+        fg_user = GraphAPI.new('ACCESS_TOKEN')
+        fg_user.thumbnail.should == 'PHOTO_URI'
+      end
     end
   end
 end
