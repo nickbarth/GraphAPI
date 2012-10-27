@@ -2,17 +2,18 @@ require 'json'
 require 'rest_client'
 require 'graph_api/version'
 
-# Public: Various methods useful for interfacing with Facebook Graph protocol.
+# Public: GraphAPI is a Ruby Gem created to simplifiy and help manage
+#         authentication using the Facebook Graph API.
 #
 # Example:
 #
 #   get '/facebook_login' do
-#     redirect FaceGraph.auth_url
+#     redirect GraphAPI.auth_url
 #   end
 #
-#   get '/facebook_auth' do
-#     @facebook_user = GraphAPI.fetch_user(params[:code])
-#     @photo = GraphAPI.fetch_photo(@facebook_user['access_token'])
+#   get '/facebook_callback' do
+#     @facebook_user = GraphAPI.new(params[:code])
+#     session[:auth_token] = @facebook_user.auth_token
 #     render :signed_in
 #   end
 #
@@ -25,7 +26,7 @@ class GraphAPI
     # @app_secret = '124ca2a483f12723cafa7a5da33a3492'
     attr_accessor :app_secret
 
-    # Public: Required setting used for Facebook private application client ID.
+    # Public: Required setting used for Facebook application Id.
     #
     # Example
     #
@@ -104,17 +105,15 @@ class GraphAPI
     JSON.parse(RestClient.get "https://graph.facebook.com#{url}&access_token=#{access_token}")
   end
 
+  # Public: Get and set the facebook access token.
   attr_accessor :access_token
+  # Public: Get and set a users data based on the current access token.
   attr_accessor :user_data
 
-  # Public: Returns a Facebook user array containing the fields set by the
-  #         @user_fields setting and the access token for convenience.
-  # Public: Convenience method for fetching a Facebook user array from the
-  #         Facebook token code.
+  # Public: Creates a new Graph API instance.
   #
-  # callback_url - With @callback_url set to nil setting this parameter will use
-  #                the sent callback. This is useful when you're using dynamic
-  #                URIs with subdomains.
+  # Returns a object representing the current Facebook user with properties
+  # specified in the self.class.user_fields hash array.
   def initialize(access_token, code=nil, callback_url=nil)
     @access_token = if not code.nil?
       self.class.fetch_token(code, callback_url)
@@ -124,8 +123,6 @@ class GraphAPI
   end
 
   # Public: Fetches and returns the cover photo src for a Facebook user.
-  #
-  # access_token - This method requires an Facebook Authentication token.
   def photo
     albums = self.class.request('/me/albums?fields=id,cover_photo,type', @access_token)['data']
     photo_id = albums.find{|x| x['type'] == 'profile'}['cover_photo']
@@ -133,18 +130,16 @@ class GraphAPI
   end
 
   # Public: Fetches and returns the current thumbnail src for a Facebook user.
-  #
-  # access_token - This method requires an Facebook Authentication token.
   def thumbnail
     self.picture['data']['url']
   end
 
   # Public: Meta methods for each of the user fields declared.
   #
-  # example
+  # Example:
   #
-  #   FGUser.new(auth_token)  # Creates a new user
-  #   puts FGUser.name        # Returns the Facebook users full name.
+  #   facebook_user = GraphAPI.new(auth_token) # Creates a new user
+  #   puts facebook_user.name                  # Returns the Facebook users full name.
   def method_missing(method, *args, &block)
     user_fields = self.class.user_fields << :picture
     if user_fields.include? method.to_sym

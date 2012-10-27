@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = GraphAPI::VERSION
   gem.authors       = ['Nick Barth']
   gem.email         = ['nick@nickbarth.ca']
-  gem.summary       = 'A Ruby Gem for common Facebook Graph API tasks.'
-  gem.description   = 'GraphAPI is a Ruby Gem containing some common tasks to help manage Facebook users using the Facebook Graph API.'
+  gem.summary       = 'A Ruby Gem for simplifying authentication using the Facebook Graph API.'
+  gem.description   = 'GraphAPI is a Ruby Gem created to simplifiy and help manage authentication using the Facebook Graph API.'
   gem.homepage      = 'https://github.com/nickbarth/GraphAPI'
 
   gem.add_dependency('rake')
