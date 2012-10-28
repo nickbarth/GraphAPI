@@ -59,11 +59,18 @@ class GraphAPI
   #
   # Example:
   #
-  # GraphAPI.config app_secret: '124ca2a483f12723cafa7a5da33a3492',
-  #                 client_id:  '234513432316919'
+  # GraphAPI.config do
+  #   app_secret '124ca2a483f12723cafa7a5da33a3492'
+  #   client_id  '234513432316919'
+  # end
   #
-  def self.config(settings)
-    settings.each do |setting, value|
+  def self.config(&block)
+    config = Class.new do
+      def self.method_missing(setting, value)
+        @settings ||= []
+        @settings << [setting, value]
+      end
+    end.class_eval(&block).each do |setting, value|
       self.send("#{setting}=", value)
     end
   end

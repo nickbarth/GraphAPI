@@ -7,12 +7,13 @@ describe GraphAPI do
 
   describe '#config' do
     it 'should configuration constants to be set' do
-      GraphAPI.config app_secret:   'APP_SECRET',
-                      client_id:    'CLIENT_ID',
-                      callback_url: 'CALLBACK_URL',
-                      access_scope: 'ACCESS_SCOPE',
-                      user_fields:  'USER_FIELDS'
-
+      GraphAPI.config do
+        app_secret   'APP_SECRET'
+        client_id    'CLIENT_ID'
+        callback_url 'CALLBACK_URL'
+        access_scope 'ACCESS_SCOPE'
+        user_fields  'USER_FIELDS'
+      end
       GraphAPI.app_secret.should   == 'APP_SECRET'
       GraphAPI.client_id.should    == 'CLIENT_ID'
       GraphAPI.callback_url.should == 'CALLBACK_URL'
