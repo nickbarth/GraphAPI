@@ -12,7 +12,7 @@ require 'graph_api/version'
 #   end
 #
 #   get '/facebook_callback' do
-#     @facebook_user = GraphAPI.new(params[:code])
+#     @facebook_user = GraphAPI.new(false, params[:code])
 #     session[:auth_token] = @facebook_user.auth_token
 #     render :signed_in
 #   end
