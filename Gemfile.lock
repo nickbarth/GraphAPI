@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    graph-api (0.9.8)
+    graph-api (0.9.9)
       json
       rake
       rest-client

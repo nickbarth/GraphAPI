@@ -11,12 +11,14 @@ describe GraphAPI do
         app_secret   'APP_SECRET'
         client_id    'CLIENT_ID'
         callback_url 'CALLBACK_URL'
+        logout_url   'LOGOUT_URL'
         access_scope 'ACCESS_SCOPE'
         user_fields  'USER_FIELDS'
       end
       GraphAPI.app_secret.should   == 'APP_SECRET'
       GraphAPI.client_id.should    == 'CLIENT_ID'
       GraphAPI.callback_url.should == 'CALLBACK_URL'
+      GraphAPI.logout_url.should   == 'LOGOUT_URL'
       GraphAPI.access_scope.should == 'ACCESS_SCOPE'
       GraphAPI.user_fields.should  == 'USER_FIELDS'
     end
@@ -73,12 +75,13 @@ describe GraphAPI do
   end
 
   context 'Instance' do
+    let(:fg_user) { GraphAPI.new('ACCESS_TOKEN') }
+
     describe '#photo' do
       it 'should return a photo URI' do
         albums_data = {'data' => [{'type' => 'profile', 'cover_photo' => 'PHOTO_ID'}]}
         GraphAPI.should_receive(:request).with('/me/albums?fields=id,cover_photo,type', 'ACCESS_TOKEN').and_return(albums_data)
         GraphAPI.should_receive(:request).with('/PHOTO_ID/?fields=source', 'ACCESS_TOKEN').and_return({'source' => 'PHOTO_URI'})
-        fg_user = GraphAPI.new('ACCESS_TOKEN')
         fg_user.photo.should == 'PHOTO_URI'
       end
     end
@@ -87,8 +90,13 @@ describe GraphAPI do
       it 'should return a photo URI' do
         GraphAPI.user_fields = []
         GraphAPI.should_receive(:request).with('/me?fields=picture', 'ACCESS_TOKEN').and_return({'picture' => {'data' => {'url' => 'PHOTO_URI'}}})
-        fg_user = GraphAPI.new('ACCESS_TOKEN')
         fg_user.thumbnail.should == 'PHOTO_URI'
+      end
+    end
+
+    describe '#logout_url' do
+      it 'should return the correct logout URL' do
+        fg_user.logout_url.should == 'https://www.facebook.com/logout.php?next=LOGOUT_URL&access_token=ACCESS_TOKEN'
       end
     end
   end

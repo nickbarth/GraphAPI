@@ -18,6 +18,7 @@ You will have to configure the gem before using it. Here is an example setup.
       app_secret   '124ca2a483f12723cafa7a5da33a3492'      # The Facebook Application Secret
       client_id    '234513432316919'                       # The Facebook Application Id
       callback_url 'http://example.com/facebook_callback/' # URI for receiving the Facebook code param
+      logout_url   'http://example.com/logout/'            # URI to redirect to when logging out
       access_scope [:offline_access, :email, :user_photos] # The Facebook application requirements
       user_fields  [:id, :picture, :name, :gender, :email] # The user fields pulled for
     end

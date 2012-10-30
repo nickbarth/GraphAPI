@@ -40,6 +40,13 @@ class GraphAPI
     # @callback_url = nil
     attr_accessor :callback_url
 
+    # Public: Non-reqired setting used for Facebook call back URL when logging out of a Facebook application.
+    #
+    # Example
+    #
+    # @logout_url = nil
+    attr_accessor :logout_url
+
     # Public: Required setting used for setting Facebook application requirements.
     #
     # Example
@@ -139,6 +146,12 @@ class GraphAPI
   # Public: Fetches and returns the current thumbnail src for a Facebook user.
   def thumbnail
     self.picture['data']['url']
+  end
+
+  # Public: Returns a URL designed to log a user out of Facebook and redirect
+  #         them back to your Facebook application.
+  def logout_url
+    "https://www.facebook.com/logout.php?next=#{self.class.logout_url}&access_token=#@access_token"
   end
 
   # Public: Meta methods for each of the user fields declared.
