@@ -1,4 +1,4 @@
-# GraphAPI
+# GraphAPI [![Build Status](https://secure.travis-ci.org/nickbarth/GraphAPI.png?branch=master)](https://travis-ci.org/nickbarth/GraphAPI)
 GraphAPI is a Ruby Gem created to simplifiy and help manage authentication using
 the Facebook Graph API.
 
